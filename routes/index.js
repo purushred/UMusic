@@ -1,24 +1,20 @@
 var express = require('express');
 var router = express.Router();
-var youtubeStream = require('youtube-audio-stream')
-/* GET home page. */
+var youtubedl = require('youtube-dl');
 router.get('/', function(req, res, next) {
-  //res.send("Hello World!!");
 
-  var getAudio = function(req, res) {
+var url = 'https://www.youtube.com/watch?v=iE8yHtmEYjM';
+youtubedl.getInfo(url, function(err, info) {
+  if (err) throw err;
  
-  var requestUrl = 'http://youtube.com/watch?v=-IPKPz1pujM' ;//+ req.params.videoId;
- 
-  try {
-  	console.log("Before Download");
-    youtubeStream(requestUrl).pipe(res);
-    console.log("After Download");
-  } catch(exception) {
-    res.status(500).send(exception);
-  }
- 
-};
-getAudio();
+  console.log('id:', info.id);
+  console.log('title:', info.title);
+  console.log('url:', info.url);
+  console.log('filename:', info._filename);
+  console.log('format id:', info.format_id);
+  res.send("Album Title: "+info.title);  
+});
+  
 });
 
 module.exports = router;
