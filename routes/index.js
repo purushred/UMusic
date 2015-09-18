@@ -5,11 +5,13 @@ var fluentFfmpeg = require('fluent-ffmpeg');
 var exec = require('child_process').exec;
 
 router.get('/', function(req, res, next) {
-var url = 'https://www.youtube.com/watch?v=iE8yHtmEYjM';
-var outputDir = "/root/node_workspace/umusic/audio/audio1.mp3";
-var ytdl = youtubedl(url,['-f','bestaudio','--extract-audio']);
-var ffmpeg = new fluentFfmpeg({source:ytdl})
-ffmpeg.withAudioCodec('libmp3lame')
+  console.log("get method invoked");
+  var url = 'https://www.youtube.com/watch?v=iE8yHtmEYjM';
+  var outputDir = "/root/node_workspace/umusic/audio/audio1.mp3";
+  var ytdl = youtubedl(url,['-f','bestaudio','--extract-audio']);
+  var ffmpeg = new fluentFfmpeg({source:ytdl})
+	console.log("before ffmpeg");
+  ffmpeg.withAudioCodec('libmp3lame')
     .audioBitrate('192k')
     .toFormat('mp3')
     .on('start', function(cmd) {
@@ -21,10 +23,7 @@ ffmpeg.withAudioCodec('libmp3lame')
     })
     .on('end', function() {
         console.log('Processing finished !');
-	function execute(command, callback){
-	    exec(command, function(error, stdout, stderr){ callback(error,stdout,stderr); });
-	};
-	execute("ffmpeg -i "+outputDir+" -af silencedetect=n=-20dB:d=1 -f null -",function(error,stdout,stderr){
+	exec("ffmpeg -i "+outputDir+" -af silencedetect=n=-20dB:d=1 -f null -",function(error,stdout,stderr){
 	var lines = stderr.toString().split('\n');
 	var previousStartTime="0";
 	var trackNo=0;
@@ -34,14 +33,14 @@ ffmpeg.withAudioCodec('libmp3lame')
 			trackNo++;
 			var startTime = line.split(": ")[1];
 			var diff = Number(startTime)-Number(previousStartTime);
-			var cmd = "ffmpeg -ss "+previousStartTime+" -i "+outputDir+" -t "+diff+" -acodec copy track-"+trackNo+".mp3";
+			var splitFileCmd = "ffmpeg -ss "+previousStartTime+" -i "+outputDir+" -t "+diff+" -acodec copy track-"+trackNo+".mp3";
 			previousStartTime = startTime;
-			console.log(cmd);
-		        exec(cmd, function(error, stdout, stderr){});
+			console.log(splitFileCmd);
+		        exec(splitFileCmd, function(error, stdout, stderr){});
 		}
-    	});
-});
-    })
+    	});// for each loop
+      }); // exe method
+    }); // on end method
 }); // router.get method end
 
 module.exports = router;
