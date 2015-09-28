@@ -5,43 +5,40 @@ var fluentFfmpeg = require('fluent-ffmpeg');
 var exec = require('child_process').exec;
 
 router.get('/', function(req, res, next) {
-  console.log("get method invoked");
-  var url = 'https://www.youtube.com/watch?v=iE8yHtmEYjM';
-  var outputDir = "/root/node_workspace/umusic/audio/audio1.mp3";
-  var ytdl = youtubedl(url,['-f','bestaudio','--extract-audio']);
-  var ffmpeg = new fluentFfmpeg({source:ytdl})
-	console.log("before ffmpeg");
-  ffmpeg.withAudioCodec('libmp3lame')
-    .audioBitrate('192k')
-    .toFormat('mp3')
-    .on('start', function(cmd) {
-        console.log("Mp3 file conversion started");
-    })
-    .on('error', function(err) {
-        console.log('An error occurred: ' + err.message);
-  	res.send("Failed to save file : "+err);
-    })
-    .on('end', function() {
-        console.log('Processing finished !');
-	exec("ffmpeg -i "+outputDir+" -af silencedetect=n=-20dB:d=1 -f null -",function(error,stdout,stderr){
-	var lines = stderr.toString().split('\n');
-	var previousStartTime="0";
-	var trackNo=0;
-    	lines.forEach(function(line) {
-		if(line.indexOf("silence_start")>-1)
-		{
-			trackNo++;
-			var startTime = line.split(": ")[1];
-			var diff = Number(startTime)-Number(previousStartTime);
-			var splitFileCmd = "ffmpeg -ss "+previousStartTime+" -i "+outputDir+" -t "+diff+" -acodec copy track-"+trackNo+".mp3";
-			previousStartTime = startTime;
-			console.log(splitFileCmd);
-		        exec(splitFileCmd, function(error, stdout, stderr){});
-		}
-    	});// for each loop
-      }); // exe method
-    }); // on end method
+  //var url = req.query.url;
+//  var url ='https://www.youtube.com/watch?v=s7sSjAwORp0';
+var url = 'https://www.youtube.com/watch?v=H7HmzwI67ec';
+var outputFile = "/root/node_workspace/umusic/audio/";
+var ytdl = youtubedl(url,['-x', '--audio-format', 'mp3','--audio-quality','2']);//['-f','bestaudio','--extract-audio']);
+ytdl.on('info', function(info) {
+  console.log('Got video info',info);
+res.writeHead(200, {
+        'Content-Type': 'audio/mpeg'
+    });
+  ytdl.pipe(res);
+});
+
+
+/*var url = 'https://www.youtube.com/watch?v=H7HmzwI67ec';
+//  youtube-dl --extract-audio --audio-format mp3  --audio-quality 2 'https://www^Coutube.com/watch?v=s7sSjAwORp0'
+youtubedl.exec(url, ['-x', '--audio-format', 'mp3','--audio-quality','2'], {}, function(err, output) {
+  if (err) throw err;
+  console.log("OutPUT:",output.join('\n'));
+res.writeHead(200, {
+        'Content-Type': 'audio/mpeg'
+    });
+  youtubedl.pipe(res);
+  res.send("File Download completed");
+});*/
+
+/*youtubedl.getInfo(url, function(err, info) {
+  if (err) throw err;
+  outputFile += info.title.split(' ')[0]+".mp3";
+  console.log('title:', info.title);
+  console.log('thumbnail:', info.thumbnail);
+  console.log('filename:', info._filename);
+}); // youtubedl.getInfo method end
+*/
 }); // router.get method end
 
 module.exports = router;
-
