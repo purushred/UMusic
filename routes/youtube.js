@@ -1,13 +1,10 @@
 var express = require('express');
-var router = express.Router();
-var fs = require('fs');
 var youtubedl = require('youtube-dl');
 var fluentFfmpeg = require('fluent-ffmpeg');
 var exec = require('child_process').exec;
 
-router.get('/', function(req, res, next) {
-  //var url = req.query.url;
-  var url = 'https://www.youtube.com/watch?v=s7sSjAwORp0'; 
+exports.handleRequest = function(url,res) {
+  console.log("Handle Request method called.");
   var outputFile = "/root/node_workspace/umusic/audio/";
   var ytdl = youtubedl(url,['-f','bestaudio','--extract-audio']);
 
@@ -48,12 +45,12 @@ router.get('/', function(req, res, next) {
      console.log(splitFileCmd);
      exec(splitFileCmd, function(error, stdout, stderr){});
    }
-    	});// for each loop
+      });// for each loop
    res.send("Album Created Successfully");
       }); // exe method
     //}).pipe(res); // on end method == Uncomment here to stream
     }).saveToFile(outputFile); // on end method
 });
-}); // router.get method end
 
-module.exports = router;
+}
+

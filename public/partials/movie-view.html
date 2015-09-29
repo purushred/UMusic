@@ -1,0 +1,17 @@
+<table class="table movietable">
+    <tr>
+        <td><h3>Details for {{movie.title}}</h3></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Movie Title</td>
+        <td>{{movie.title}}</td>
+    </tr>
+    <tr>
+        <td>Youtube URL</td>
+        <td>{{movie.youtubeUrl}}</td>
+    </tr>    
+</table>
+<div>
+    <a class="btn btn-primary" ui-sref="editMovie({id:movie._id})">Edit</a>
+</div>
