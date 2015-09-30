@@ -20,7 +20,8 @@ angular.module('movieApp.controllers',[]).controller('MovieListController',funct
         console.log("Movie adding successful.");
         $scope.movie.songs = $scope.songs;
         $scope.movie.$save(function(){
-            $state.go('movies');
+	    alert("Created successfully");
+            //$state.go('movies');
         });
     }
     $scope.newEntry = function() {
