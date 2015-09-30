@@ -19,7 +19,7 @@ router.get('/movies', function(req, res, next) {
   
 }).post('/movies', function(req, res, next) {
 
-    youtube.handleRequest(req.body.youtubeUrl,res);
+    youtube.handleRequest(req.body.songs[0].youtubeUrl,res);
     //res.send(req.body);
     console.log("Posted movies",req.body);
 });

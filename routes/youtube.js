@@ -16,7 +16,6 @@ exports.handleRequest = function(url,res) {
     console.log('thumbnail:', info.thumbnail);
     console.log('filename:', info._filename);
     var ffmpeg = new fluentFfmpeg({source:ytdl})
- //   .audioBitrate('192k')
  ffmpeg.withAudioCodec('libmp3lame')
  .audioQuality(2)
  .toFormat('mp3')
