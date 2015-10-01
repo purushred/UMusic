@@ -10,41 +10,43 @@
         <input type="text" ng-model="movie.musicDirector" class="form-control" id="musicDirector"/>
     </div>
 </div>
-<div class="panel panel-default" ng-repeat="song in songs track by $index">
-  <div class="panel-body">
-   
+
 <div class="form-group">
-    <label for="youtubeUrl" class="col-sm-2 control-label">Song URL</label>
+    <label for="myForm" class="col-sm-2 control-label">Album Type</label>
     <div class="col-sm-5">
-        <input type="url" ng-model="song.youtubeUrl" class="form-control" id="youtubeUrl"/>
-    </div>
-</div>
-<div class="form-group">
-    <label for="song" class="col-sm-2 control-label">Song Name</label>
-    <div class="col-sm-5">
-        <input type="text" ng-model="song.song" class="form-control" id="song"/>
-    </div>
-</div>
-<div class="form-group">
-    <label for="singer" class="col-sm-2 control-label">Singer</label>
-    <div class="col-sm-5">
-        <input type="text" ng-model="song.singer" class="form-control" id="singer"/>
-    </div>
-</div>
-<div class="form-group">
-    <label for="lyricist" class="col-sm-2 control-label">Lyricist</label>
-    <div class="col-sm-5">
-        <input type="text" ng-model="song.lyricist" class="form-control" id="lyricist"/>
+        <form name="myForm">
+          <label class="radio-inline">
+            <input type="radio" ng-model="movie.mode" value="manual">Manual</label>
+          <label class="radio-inline">
+            <input type="radio" ng-model="movie.mode" value="auto">Automatic</label>
+        </form>
     </div>
 </div>
 
-  </div>
-</div>
 <div class="form-group">
-    <div class="col-sm-offset-3 col-sm-1">
-        <input type="submit" class="btn btn-primary" value="Save"/>
+    <label for="qualityForm" class="col-sm-2 control-label">Audio Quality</label>
+    <div class="col-sm-5">
+        <form name="qualityForm">
+          <label class="radio-inline">
+            <input type="radio" ng-model="movie.quality" value="best">Best</label>
+            <label class="radio-inline">
+                <input type="radio" ng-model="movie.quality" value="better">Better</label>
+            <label class="radio-inline">
+                <input type="radio" ng-model="movie.quality" value="good">Good</label>
+        </form>
     </div>
-    <div class="col-sm-1">
-        <input type="button" ng-click="newEntry()" class="btn btn-info" value="Add New"/>
+</div>
+
+<div ui-grid="gridOptions" ui-grid-edit ui-grid-row-edit ui-grid-cellNav ng-grid="gridOptions" class="grid"/>
+
+<div class="form-group">
+    <div class="col-sm-offset-1 col-sm-2">
+        <input type="button" ng-click="newEntry()" class="btn btn-primary" value="Add Song"/>
+    </div>
+    <div class="col-sm-2">
+        <input type="submit" class="btn btn-danger" value="Delete Song"/>
+    </div>
+    <div class="col-sm-2">
+        <input type="submit" class="btn btn-success" value="Create Album"/>
     </div>
 </div>

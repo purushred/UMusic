@@ -13,9 +13,21 @@ angular.module('movieApp.controllers',[]).controller('MovieListController',funct
 
 }).controller('MovieCreateController',function($scope,$state,$stateParams,Movie){
 
+$scope.gridOptions = { 
+        data: 'songs',
+        enableCellSelection: true,
+        enableRowSelection: false,
+        enableCellEditOnFocus: true,
+        columnDefs: [{field: 'youtubeUrl', displayName: 'Song URL', enableCellEdit: true}, 
+                     {field:'song', displayName:'Song Name', enableCellEdit: true}, 
+                     {field:'singer', displayName:'Singer', enableCellEdit: true}, 
+                     {field:'lyricist', displayName:'Lyricist', enableCellEdit: true}]
+    };
+
     $scope.movie=new Movie();
     $scope.songs=new Array();
     $scope.song = {'youtubeUrl':'','song':'','singer':'','lyricist':''};
+    $scope.songs.push($scope.song);
     $scope.addMovie=function(){
         console.log("Movie adding successful.");
         $scope.movie.songs = $scope.songs;

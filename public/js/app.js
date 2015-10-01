@@ -1,8 +1,6 @@
-/**
- * Created by Sandeep on 01/06/14.
- */
 
-angular.module('movieApp',['ui.router','ngResource','movieApp.controllers','movieApp.services']);
+angular.module('movieApp',['ui.router','ngResource','movieApp.controllers','movieApp.services',
+  'ui.grid', 'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav']);
 
 angular.module('movieApp').config(function($stateProvider,$httpProvider){
     $stateProvider.state('movies',{
