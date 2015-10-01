@@ -11,22 +11,38 @@ angular.module('movieApp.controllers',[]).controller('MovieListController',funct
 
     $scope.movie=Movie.get({id:$stateParams.id});
 
-}).controller('MovieCreateController',function($scope,$state,$stateParams,Movie){
+}).controller('MovieCreateController',function($scope,$state,$stateParams,$q, $interval,Movie){
 
 $scope.gridOptions = { 
         data: 'songs',
         enableCellSelection: true,
         enableRowSelection: false,
         enableCellEditOnFocus: true,
-        columnDefs: [{field: 'youtubeUrl', displayName: 'Song URL', enableCellEdit: true}, 
+        columnDefs: [{field: 'startTime', displayName: 'Start Time', enableCellEdit: true}, 
                      {field:'song', displayName:'Song Name', enableCellEdit: true}, 
                      {field:'singer', displayName:'Singer', enableCellEdit: true}, 
                      {field:'lyricist', displayName:'Lyricist', enableCellEdit: true}]
     };
-
+$scope.saveRow = function( rowEntity ) {
+    var promise = $q.defer();
+    $scope.gridApi.rowEdit.setSavePromise( rowEntity, promise.promise );
+    $interval( function() {
+      if (rowEntity.gender === 'male' ){
+        promise.reject();
+      } else {
+        promise.resolve();
+      }
+    }, 3000, 1);
+  };
+ 
+  $scope.gridOptions.onRegisterApi = function(gridApi){
+    //set gridApi on scope
+    $scope.gridApi = gridApi;
+    gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
+  };
     $scope.movie=new Movie();
     $scope.songs=new Array();
-    $scope.song = {'youtubeUrl':'','song':'','singer':'','lyricist':''};
+    $scope.song = {'startTime':'','song':'','singer':'','lyricist':''};
     $scope.songs.push($scope.song);
     $scope.addMovie=function(){
         console.log("Movie adding successful.");
@@ -38,7 +54,7 @@ $scope.gridOptions = {
     }
     $scope.newEntry = function() {
         console.log("New entry");
-        $scope.song = {'youtubeUrl':'','song':'','singer':'','lyricist':''};
+        $scope.song = {'startTime':'','song':'','singer':'','lyricist':''};
         $scope.songs.push($scope.song);   
     }
 

@@ -9,17 +9,17 @@ var outputFile = "/root/node_workspace/umusic/audio/";
 
 exports.handleRequest = function(req,res) {
   var movie = req.body;
-  var url = movie.songs[0].youtubeUrl;
+  var url = movie.youtubeUrl;
   var ytdl = youtubedl(url,['-f','bestaudio','--extract-audio']);
 
   youtubedl.getInfo(url, function(err, info) {
     if (err) throw err;
-    outputFile += info.title.split(' ')[0]+".mp3";
+    outputFile += movie.title+".mp3";
     console.log('thumbnail:', info.thumbnail);
-
+    console.log("Movie Quality:",movie.quality);
     var ffmpeg = new fluentFfmpeg({source:ytdl})
     ffmpeg.withAudioCodec('libmp3lame')
-     .audioQuality(2)
+     .audioQuality(movie.quality)
      .toFormat('mp3')
      .on('start', function(cmd) {
         console.log("Mp3 file conversion started");
@@ -38,27 +38,24 @@ exports.handleRequest = function(req,res) {
       }
       for(var i=0;i<noOfSongs;i++)
       {
-        var query = urlModule.parse(songs[i].youtubeUrl,true).query;
-	var startTime = query.t;
+	var startTime = songs[i].startTime;
 	var splitFileCmd;
 	if(i==noOfSongs-1)
 	{
      	  splitFileCmd = "ffmpeg -ss "+startTime+" -i "+outputFile+" -i "+info.thumbnail.replace("https","http")+" -acodec copy -map 0 -map 1 -metadata title=\'"+songs[i].song+"\' -metadata album=\'"+movie.title+"\' -metadata album_artist=\'"+songs[i].singer+"\' -metadata composer=\'"+movie.musicDirector+"\' \'"+dir+"/"+songs[i].song+".mp3\'";
 	}
 	else {
-          var nextQuery = urlModule.parse(songs[i+1].youtubeUrl,true).query;
-	  var nextStartTime = nextQuery.t;
-	  var diff = Number(nextStartTime)-Number(startTime);
-          splitFileCmd = "ffmpeg -ss "+startTime+" -i "+outputFile+" -i "+info.thumbnail.replace("https","http")+" -t "+diff+" -acodec copy -map 0 -map 1 -metadata title=\'"+songs[i].song+"\' -metadata album=\'"+movie.title+"\' -metadata album_artist=\'"+songs[i].singer+"\' -metadata composer=\'"+movie.musicDirector+"\' \'"+dir+"/"+songs[i].song+".mp3\'";
+	  var nextStartTime = songs[i+1].startTime;
+          splitFileCmd = "ffmpeg -ss "+startTime+" -i "+outputFile+" -i "+info.thumbnail.replace("https","http")+" -t "+nextStartTime+" -acodec copy -map 0 -map 1 -metadata title=\'"+songs[i].song+"\' -metadata album=\'"+movie.title+"\' -metadata album_artist=\'"+songs[i].singer+"\' -metadata composer=\'"+movie.musicDirector+"\' \'"+dir+"/"+songs[i].song+".mp3\'";
 	}
         console.log(splitFileCmd);
         exec(splitFileCmd, function(error, stdout, stderr){});
       }
  
-	fs.unlink(outputFile,function(err){
+	/*fs.unlink(outputFile,function(err){
 	   if(err) console.log("Failed to delete file.");
 	   console.log("File deleted successfully.");
-	});
+	});*/
       res.send("Album Created Successfully");
 
     }).saveToFile(outputFile); // on end method
