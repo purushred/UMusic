@@ -4,19 +4,85 @@ var youtubedl = require('youtube-dl');
 var fluentFfmpeg = require('fluent-ffmpeg');
 var exec = require('child_process').exec;
 var urlModule = require('url');
+var parseString = require('xml2js').parseString;
+var https = require('https');
 
+function xmlToJson(url, callback) {
+  var req = https.get(url, function(res) {
+    var xml = '';
+    
+    res.on('data', function(chunk) {
+      xml += chunk;
+    });
+
+    res.on('error', function(e) {
+      callback(e, null);
+    }); 
+
+    res.on('timeout', function(e) {
+      callback(e, null);
+    }); 
+
+    res.on('end', function() {
+      callback(null, xml);
+    });
+  });
+}
+
+function sortNumber(a,b) {
+    return a - b;
+}
+
+function getTimeArray(err, data) {
+  if (err) {
+    return console.err(err);
+  }
+  var xpath = require('xpath');
+  var dom = require('xmldom').DOMParser;
+ 
+    var doc = new dom().parseFromString(data);
+    var nodes = xpath.select("/document/annotations/annotation/action/url[@target=\'current\']", doc);
+    var timeArray = new Array();
+    for(var i=0;i<nodes.length;i++){
+      var urlStr = nodes[i].attributes['1'].nodeValue;
+      var hash = urlModule.parse(urlStr).hash;
+      if(hash){
+        hash=hash.substring(3,hash.length-1);
+        hash=hash.replace("m",":");
+        var a = hash.split(':');
+        var seconds=0;
+        if(a.length>2){
+          seconds = ((+a[0]) * 60 * 60) + ((+a[1]) * 60)+ (+a[2]);   
+        }
+        else {
+          seconds = ((+a[0]) * 60)+ (+a[1]);
+        }
+        timeArray.push(seconds);
+      }
+      else {
+        timeArray.push(0);
+      }
+    }
+    console.log(timeArray.sort(sortNumber));
+}
+
+var annotationUrl = "https://www.youtube.com/annotations_invideo?video_id=Z0-yDaWOX7I";
 var outputFile = "/root/node_workspace/umusic/audio/";
 
 exports.handleRequest = function(req,res) {
-  var movie = req.body;
-  var url = movie.youtubeUrl;
-  var ytdl = youtubedl(url,['-f','bestaudio','--extract-audio']);
+  xmlToJson(annotationUrl, getTimeArray);
 
-  youtubedl.getInfo(url, function(err, info) {
+  /*
+    var movie = req.body;
+    var url = movie.youtubeUrl;
+    var ytdl = youtubedl(url,['-f','bestaudio','--extract-audio']);
+    youtubedl.getInfo(url, function(err, info) {
     if (err) throw err;
+
     outputFile += movie.title+".mp3";
     console.log('thumbnail:', info.thumbnail);
     console.log("Movie Quality:",movie.quality);
+    var youtubeId = info.id;
     var ffmpeg = new fluentFfmpeg({source:ytdl})
     ffmpeg.withAudioCodec('libmp3lame')
      .audioQuality(movie.quality)
@@ -52,13 +118,13 @@ exports.handleRequest = function(req,res) {
         exec(splitFileCmd, function(error, stdout, stderr){});
       }
  
-	/*fs.unlink(outputFile,function(err){
+	fs.unlink(outputFile,function(err){
 	   if(err) console.log("Failed to delete file.");
 	   console.log("File deleted successfully.");
-	});*/
+	});
       res.send("Album Created Successfully");
 
     }).saveToFile(outputFile); // on end method
-  }); // end of youtubedl.getInfo method
+  }); */ // end of youtubedl.getInfo method
 }
 

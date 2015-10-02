@@ -4,8 +4,8 @@
 
 angular.module('movieApp.services',[]).factory('Movie',function($resource){
 	// ec2-52-10-19-132.us-west-2.compute.amazonaws.com
-    //return $resource('http://localhost:8080/api/movies/:id',{id:'@_id'},{
-    return $resource('http://ec2-52-10-19-132.us-west-2.compute.amazonaws.com:8080/api/movies/:id',{id:'@_id'},{
+    return $resource('http://localhost:8080/api/movies/:id',{id:'@_id'},{
+    //return $resource('http://ec2-52-10-19-132.us-west-2.compute.amazonaws.com:8080/api/movies/:id',{id:'@_id'},{
         update: {
             method: 'PUT'
         }
